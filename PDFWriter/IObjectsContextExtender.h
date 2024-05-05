@@ -20,8 +20,12 @@
 */
 #pragma once
 
+#include <list>
+
 class IByteWriter;
 class IByteWriterWithPosition;
+
+typedef std::list<std::string> StringList;
 
 class IObjectsContextExtender
 {
@@ -30,6 +34,10 @@ public:
 	virtual ~IObjectsContextExtender(){}
 
 	// PDFStream object compression extensibility
+
+	// Get the filter names of the extender
+	// Let us make extender chain
+	virtual void GetCompressionFilters(StringList& filters) = 0;
 
 	// flag to determine if the extender takes over compression or not
 	// if true than other compression methods will be called in case compression is required

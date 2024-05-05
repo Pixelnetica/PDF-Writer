@@ -119,7 +119,7 @@ namespace PDFHummus
 		void SetObjectsContext(ObjectsContext* inObjectsContext);
 		void SetOutputFileInformation(OutputFile* inOutputFile);
 		void SetEmbedFonts(bool inEmbedFonts);
-		PDFHummus::EStatusCode	WriteHeader(EPDFVersion inPDFVersion);
+		PDFHummus::EStatusCode	WriteHeader(EPDFVersion inPDFVersion,bool inBinaryData);
 		PDFHummus::EStatusCode	FinalizeNewPDF();
         PDFHummus::EStatusCode	FinalizeModifiedPDF(PDFParser* inModifiedFileParser,EPDFVersion inModifiedPDFVersion);
 

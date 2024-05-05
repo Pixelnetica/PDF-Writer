@@ -86,7 +86,7 @@ EStatusCode PDFWriter::StartPDF(
 
 	mIsModified = false;
 
-	return mDocumentContext.WriteHeader(thisOrDefaultVersion(inPDFVersion));
+	return mDocumentContext.WriteHeader(thisOrDefaultVersion(inPDFVersion),inPDFCreationSettings.BinaryData);
 }
 
 EStatusCode PDFWriter::EndPDF()
@@ -560,7 +560,7 @@ EStatusCode PDFWriter::StartPDFForStream(IByteWriterWithPosition* inOutputStream
 	mObjectsContext.SetOutputStream(inOutputStream);
     mIsModified = false;
 
-	return mDocumentContext.WriteHeader(thisOrDefaultVersion(inPDFVersion));
+	return mDocumentContext.WriteHeader(thisOrDefaultVersion(inPDFVersion),inPDFCreationSettings.BinaryData);
 }
 EStatusCode PDFWriter::EndPDFForStream()
 {
