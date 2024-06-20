@@ -537,6 +537,11 @@ void ObjectsContext::SetObjectsContextExtender(IObjectsContextExtender* inExtend
 	mExtender = inExtender;
 }
 
+IObjectsContextExtender* ObjectsContext::GetObjectsContextExtender(void) 
+{
+	return mExtender;
+}
+
 std::string ObjectsContext::GenerateSubsetFontPrefix()
 {
 	return mSubsetFontsNamesSequance.GetNextValue();
