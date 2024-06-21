@@ -39,6 +39,8 @@ public:
 	// Let us make extender chain
 	virtual void GetCompressionFilters(StringList& filters) = 0;
 
+	virtual void SetAdditionalFilters(const StringList& filters) = 0;
+
 	// flag to determine if the extender takes over compression or not
 	// if true than other compression methods will be called in case compression is required
 	virtual bool OverridesStreamCompression() = 0;
