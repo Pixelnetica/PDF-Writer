@@ -126,7 +126,6 @@ public:
 
 	// Extensibility
 	void SetObjectsContextExtender(IObjectsContextExtender* inExtender);
-	IObjectsContextExtender* GetObjectsContextExtender(void);
 	
 
 	// as the obly common context around...i'm using the objects context to create

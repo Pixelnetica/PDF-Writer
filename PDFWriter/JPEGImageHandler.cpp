@@ -30,7 +30,6 @@
 #include "ObjectsContext.h"
 #include "DictionaryContext.h"
 #include "IDocumentContextExtender.h"
-#include "IObjectsContextExtender.h"
 #include "ProcsetResourcesConstants.h"
 #include "DocumentContext.h"
 #include "XObjectContentContext.h"
@@ -124,7 +123,6 @@ PDFImageXObject* JPEGImageHandler::CreateAndWriteImageXObjectFromJPGInformation(
 {
 	PDFImageXObject* imageXObject = NULL;
 	EStatusCode status = PDFHummus::eSuccess;
-	IObjectsContextExtender* extender = NULL;
 
 	do
 	{
@@ -192,14 +190,8 @@ PDFImageXObject* JPEGImageHandler::CreateAndWriteImageXObjectFromJPGInformation(
 			break;
 
 		// Decoder - DCTDecode
-		extender = (mObjectsContext->IsCompressingStreams()) ?
-				mObjectsContext->GetObjectsContextExtender() : NULL;
-		if (extender) {
-			extender->SetAdditionalFilters(StringList { scDCTDecode });
-		} else {
-			imageContext->WriteKey(scFilter);
-			imageContext->WriteNameValue(scDCTDecode);
-		}
+		imageContext->WriteKey(scFilter);
+		imageContext->WriteNameValue(scDCTDecode);
 
 		IDocumentContextExtenderSet::iterator it = mExtenders.begin();
 		EStatusCode status = PDFHummus::eSuccess;
@@ -216,9 +208,7 @@ PDFImageXObject* JPEGImageHandler::CreateAndWriteImageXObjectFromJPGInformation(
 			break;
 
 
-		PDFStream* imageStream = (extender) ?
-				 mObjectsContext->StartPDFStream(imageContext) :
-				 mObjectsContext->StartUnfilteredPDFStream(imageContext);
+		PDFStream* imageStream = mObjectsContext->StartUnfilteredPDFStream(imageContext);
 
 		OutputStreamTraits outputTraits(imageStream->GetWriteStream());
 		status = outputTraits.CopyToOutputStream(inJPGImageStream);
@@ -235,10 +225,6 @@ PDFImageXObject* JPEGImageHandler::CreateAndWriteImageXObjectFromJPGInformation(
 		imageXObject = new PDFImageXObject(inImageXObjectID,1 == inJPGImageInformation.ColorComponentsCount ? KProcsetImageB:KProcsetImageC);
 	}while(false);
 
-	// Cleanup extender
-	if (extender) {
-		extender->SetAdditionalFilters(StringList());
-	}
 
 	return imageXObject;
 }

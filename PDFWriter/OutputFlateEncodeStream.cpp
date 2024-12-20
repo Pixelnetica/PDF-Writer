@@ -94,7 +94,7 @@ void OutputFlateEncodeStream::StartEncoding()
     mZLibState->zfree = Z_NULL;
     mZLibState->opaque = Z_NULL;
 
-    int deflateStatus = deflateInit(mZLibState, Z_BEST_COMPRESSION);
+    int deflateStatus = deflateInit(mZLibState, Z_DEFAULT_COMPRESSION);
     if (deflateStatus != Z_OK)
 		TRACE_LOG1("OutputFlateEncodeStream::StartEncoding, Unexpected failure in initializating flate library. status code = %d",deflateStatus);
 	else

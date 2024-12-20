@@ -58,13 +58,11 @@ struct PDFCreationSettings
 {
 	bool CompressStreams;
 	bool EmbedFonts;
-	bool BinaryData;
 	EncryptionOptions DocumentEncryptionOptions;
 
-	PDFCreationSettings(bool inCompressStreams, bool inEmbedFonts,bool inBinaryData=true,EncryptionOptions inDocumentEncryptionOptions = EncryptionOptions::DefaultEncryptionOptions()):DocumentEncryptionOptions(inDocumentEncryptionOptions){
+	PDFCreationSettings(bool inCompressStreams, bool inEmbedFonts,EncryptionOptions inDocumentEncryptionOptions = EncryptionOptions::DefaultEncryptionOptions()):DocumentEncryptionOptions(inDocumentEncryptionOptions){
 		CompressStreams = inCompressStreams;
 		EmbedFonts = inEmbedFonts;
-		BinaryData = inBinaryData;
 	}
 
 };
