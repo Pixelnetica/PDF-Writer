@@ -7,7 +7,7 @@ AbstractContentContext.cpp
 AbstractWrittenFont.cpp
 ANSIFontWriter.cpp
 Ascii7Encoding.cpp
-ArrayOfInputStreamsStream.cpp
+ArrayOfInputStreamsStream.cpp ByteList.cpp
 CatalogInformation.cpp
 CFFANSIFontWriter.cpp
 CFFDescendentFontWriter.cpp
@@ -167,6 +167,7 @@ Ascii7Encoding.h
 ArrayOfInputStreamsStream.h
 BetweenIncluding.h
 BoxingBase.h
+ByteList.h
 CatalogInformation.h
 CFFANSIFontWriter.h
 CFFDescendentFontWriter.h
