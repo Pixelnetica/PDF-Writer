@@ -53,6 +53,7 @@ EStatusCode TrueTypeEmbeddedFontWriter::WriteEmbeddedFont(
 	MyStringBuf rawFontProgram;
 	bool notEmbedded;
 	EStatusCode status;
+	PDFStream* pdfStream = NULL;
 
 	do
 	{
@@ -72,6 +73,12 @@ EStatusCode TrueTypeEmbeddedFontWriter::WriteEmbeddedFont(
 		}
 
 		outEmbeddedFontObjectID = inObjectsContext->StartNewIndirectObject();
+		if(outEmbeddedFontObjectID == 0)
+		{
+			TRACE_LOG("TrueTypeEmbeddedFontWriter::WriteEmbeddedFont, failed to start embedded font object");
+			status = PDFHummus::eFailure;
+			break;
+		}
 		
 		DictionaryContext* fontProgramDictionaryContext = inObjectsContext->StartDictionary();
 
@@ -80,7 +87,7 @@ EStatusCode TrueTypeEmbeddedFontWriter::WriteEmbeddedFont(
 		fontProgramDictionaryContext->WriteKey(scLength1);
 		fontProgramDictionaryContext->WriteIntegerValue(rawFontProgram.GetCurrentWritePosition());
 		rawFontProgram.pubseekoff(0,std::ios_base::beg);
-		PDFStream* pdfStream = inObjectsContext->StartPDFStream(fontProgramDictionaryContext);
+		pdfStream = inObjectsContext->StartPDFStream(fontProgramDictionaryContext);
 
 
 		// now copy the created font program to the output stream
@@ -94,10 +101,10 @@ EStatusCode TrueTypeEmbeddedFontWriter::WriteEmbeddedFont(
 		}
 
 
-		inObjectsContext->EndPDFStream(pdfStream);
-		delete pdfStream;
+		status = inObjectsContext->EndPDFStream(pdfStream);
 	}while(false);
 
+	delete pdfStream;
 	return status;
 }
 
@@ -154,7 +161,14 @@ EStatusCode TrueTypeEmbeddedFontWriter::CreateTrueTypeSubset(	FreeTypeFaceWrappe
 		// so - bottom line - the glyphs count will actually be 1 more than the maxium glyph index.
 		// and from here i'll just place the glyphs in their original indexes, and fill in the 
 		// vacant glyphs with empties.
-		mSubsetFontGlyphsCount = subsetGlyphIDs.back() + 1;
+		unsigned short maxGlyf = subsetGlyphIDs.back();
+		if(maxGlyf >= mTrueTypeInput.mMaxp.NumGlyphs)
+		{
+			TRACE_LOG2("TrueTypeEmbeddedFontWriter::CreateTrueTypeSubset, error, maximum requested glyph index %ld is larger than the maximum glyph index for this font which is %ld. ",maxGlyf,mTrueTypeInput.mMaxp.NumGlyphs-1);
+			status = eFailure;
+			break;
+		}
+		mSubsetFontGlyphsCount = maxGlyf + 1;
 		
 		mFontFileStream.Assign(&outFontProgram);
 		mPrimitivesWriter.SetOpenTypeStream(&mFontFileStream);

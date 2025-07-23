@@ -318,7 +318,12 @@ static const std::string scObj = "obj";
 ObjectIDType ObjectsContext::StartNewIndirectObject()
 {
 	ObjectIDType newObjectID = mReferencesRegistry.AllocateNewObjectID();
-	mReferencesRegistry.MarkObjectAsWritten(newObjectID,mOutputStream->GetCurrentPosition());
+	EStatusCode status = mReferencesRegistry.MarkObjectAsWritten(newObjectID,mOutputStream->GetCurrentPosition());
+	if(status != eSuccess)
+	{
+		TRACE_LOG1("ObjectsContext::StartNewIndirectObject, failed to mark object as written. Object ID = %ld",newObjectID);
+		return 0;
+	}
 	mPrimitiveWriter.WriteInteger(newObjectID);
 	mPrimitiveWriter.WriteInteger(0);
 	mPrimitiveWriter.WriteKeyword(scObj);
@@ -330,9 +335,14 @@ ObjectIDType ObjectsContext::StartNewIndirectObject()
 	return newObjectID;
 }
 
-void ObjectsContext::StartNewIndirectObject(ObjectIDType inObjectID)
+EStatusCode ObjectsContext::StartNewIndirectObject(ObjectIDType inObjectID)
 {
-	mReferencesRegistry.MarkObjectAsWritten(inObjectID,mOutputStream->GetCurrentPosition());
+	EStatusCode status = mReferencesRegistry.MarkObjectAsWritten(inObjectID,mOutputStream->GetCurrentPosition());
+	if(status != eSuccess)
+	{
+		TRACE_LOG1("ObjectsContext::StartNewIndirectObject, failed to mark object as written. Object ID = %ld",inObjectID);
+		return status;
+	}
 	mPrimitiveWriter.WriteInteger(inObjectID);
 	mPrimitiveWriter.WriteInteger(0);
 	mPrimitiveWriter.WriteKeyword(scObj);
@@ -340,11 +350,17 @@ void ObjectsContext::StartNewIndirectObject(ObjectIDType inObjectID)
 	if (IsEncrypting()) {
 		mEncryptionHelper->OnObjectStart((long long)inObjectID, 0);
 	}
+	return status;
 }
 
-void ObjectsContext::StartModifiedIndirectObject(ObjectIDType inObjectID)
+EStatusCode ObjectsContext::StartModifiedIndirectObject(ObjectIDType inObjectID)
 {
-	mReferencesRegistry.MarkObjectAsUpdated(inObjectID,mOutputStream->GetCurrentPosition());
+	EStatusCode status = mReferencesRegistry.MarkObjectAsUpdated(inObjectID,mOutputStream->GetCurrentPosition());
+	if(status != PDFHummus::eSuccess)
+	{
+		TRACE_LOG1("ObjectsContext::StartModifiedIndirectObject, failed to mark object as updated. Object ID = %ld",inObjectID);
+		return status;
+	}
 	mPrimitiveWriter.WriteInteger(inObjectID);
 	mPrimitiveWriter.WriteInteger(0);
 	mPrimitiveWriter.WriteKeyword(scObj);    
@@ -352,6 +368,8 @@ void ObjectsContext::StartModifiedIndirectObject(ObjectIDType inObjectID)
 	if (IsEncrypting()) {
 		mEncryptionHelper->OnObjectStart((long long)inObjectID, 0);
 	}
+
+	return status;
 }
 
 static const std::string scEndObj = "endobj";
@@ -480,8 +498,9 @@ PDFStream* ObjectsContext::StartUnfilteredPDFStream(DictionaryContext* inStreamD
 	return result;
 }
 
-void ObjectsContext::EndPDFStream(PDFStream* inStream)
+EStatusCode ObjectsContext::EndPDFStream(PDFStream* inStream)
 {
+	EStatusCode status = eSuccess;
 	// finalize the stream write to end stream context and calculate length
 	inStream->FinalizeStreamWrite();
 
@@ -514,8 +533,10 @@ void ObjectsContext::EndPDFStream(PDFStream* inStream)
     {
         WritePDFStreamEndWithoutExtent();
         EndIndirectObject();
-        WritePDFStreamExtent(inStream);
+        status = WritePDFStreamExtent(inStream);
     }
+
+	return status;
 }
  
 	
@@ -525,11 +546,17 @@ void ObjectsContext::WritePDFStreamEndWithoutExtent()
 		WriteKeyword(scEndStream);
 }
 
-void ObjectsContext::WritePDFStreamExtent(PDFStream* inStream)
+EStatusCode ObjectsContext::WritePDFStreamExtent(PDFStream* inStream)
 {
-	StartNewIndirectObject(inStream->GetExtentObjectID());
+	EStatusCode status = StartNewIndirectObject(inStream->GetExtentObjectID());
+	if(status != PDFHummus::eSuccess)
+	{
+		TRACE_LOG1("ObjectsContext::WritePDFStreamExtent, failed to start indirect object for stream extent. Object ID = %ld",inStream->GetExtentObjectID());
+		return status;
+	}
 	WriteInteger(inStream->GetLength(),eTokenSeparatorEndLine);
 	EndIndirectObject();
+	return status;
 }
 
 void ObjectsContext::SetObjectsContextExtender(IObjectsContextExtender* inExtender)
@@ -553,7 +580,9 @@ EStatusCode ObjectsContext::WriteState(ObjectsContext* inStateWriter,ObjectIDTyp
 		
 	do
 	{
-		inStateWriter->StartNewIndirectObject(inObjectID);
+		status = inStateWriter->StartNewIndirectObject(inObjectID);
+		if(status != eSuccess)
+			break;
 
 		ObjectIDType referencesRegistryObjectID = inStateWriter->GetInDirectObjectsRegistry().AllocateNewObjectID();
 		ObjectIDType subsetFontsNameSequanceID = inStateWriter->GetInDirectObjectsRegistry().AllocateNewObjectID();
@@ -577,11 +606,13 @@ EStatusCode ObjectsContext::WriteState(ObjectsContext* inStateWriter,ObjectIDTyp
 		inStateWriter->EndIndirectObject();
 
 		status = mReferencesRegistry.WriteState(inStateWriter,referencesRegistryObjectID);
-		if(status != PDFHummus::eSuccess)
+		if(status != eSuccess)
 			break;
 
 		// write subset fonts names sequance
-		inStateWriter->StartNewIndirectObject(subsetFontsNameSequanceID);
+		status = inStateWriter->StartNewIndirectObject(subsetFontsNameSequanceID);
+		if(status != eSuccess)
+			break;
 
 		DictionaryContext* sequanceDict = inStateWriter->StartDictionary();
 
@@ -743,7 +774,7 @@ EStatusCode ObjectsContext::WriteXrefStream(DictionaryContext* inDictionaryConte
             break;
             
         // end the stream and g'bye
-        EndPDFStream(aStream);
+        status = EndPDFStream(aStream);
 
     } 
     while (false);

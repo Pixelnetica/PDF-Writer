@@ -45,6 +45,7 @@ create_test_sourcelist (Tests
   OutputFileStreamTest.cpp
   PageModifierTest.cpp
   PageOrderModification.cpp
+  ParsePDFWithOwner.cpp
   ParsingBadXref.cpp
   ParsingFaulty.cpp
   PDFCopyingContextTest.cpp
@@ -52,6 +53,7 @@ create_test_sourcelist (Tests
   PDFEmbedTest.cpp
   PDFObjectCastTest.cpp
   PDFObjectParserTest.cpp
+  PDFParserFuzzSanity.cpp
   PDFParserTest.cpp
   PDFWithPassword.cpp
   PFBStreamTest.cpp
@@ -67,6 +69,7 @@ create_test_sourcelist (Tests
   TIFFImageTest.cpp
   TiffSpecialsTest.cpp
   TimerTest.cpp
+  TrueTypeAnsiWriteBug.cpp
   TrueTypeTest.cpp
   TTCTest.cpp
   Type1Test.cpp
@@ -74,6 +77,7 @@ create_test_sourcelist (Tests
   UppercaseSequanceTest.cpp
   WatermarkTest.cpp
   WatermarkWithContextOpacityTest.cpp
+  XrefStreamsTest.cpp
 )
 
 # add the testing executable
@@ -100,11 +104,28 @@ endif(APPLE)
 
 # Add all the ADD_TEST for each test (reusing the create_test_sourcelist list minus the generated executable)
 set (TestsToRun ${Tests})
-remove (TestsToRun PDFWriterTesting.cpp)
+list(REMOVE_AT TestsToRun 0) # removing first item which is PDFWriterTesting. started getting a full path for it, so moved to REMOVE_AT instead of REMOVE_ITEM with the file name
+list(REMOVE_ITEM TestsToRun PDFParserFuzzSanity.cpp) # will add tests for this specifically
+
 foreach (test ${TestsToRun})
   get_filename_component (TName ${test} NAME_WE)
   add_test (NAME ${TName} COMMAND PDFWriterTesting ${TName} ${CMAKE_CURRENT_SOURCE_DIR}/Materials ${CMAKE_BINARY_DIR}/Testing/Output)
 endforeach ()
+
+# fuzz test errors specific
+file(GLOB fuzztestfiles ${CMAKE_CURRENT_SOURCE_DIR}/Materials/fuzzing/errors/*)
+foreach (fuzztestfile ${fuzztestfiles})
+    get_filename_component (TName ${fuzztestfile} NAME)
+    add_test (NAME FuzzTest_${TName} COMMAND PDFWriterTesting PDFParserFuzzSanity ${CMAKE_CURRENT_SOURCE_DIR}/Materials ${CMAKE_BINARY_DIR}/Testing/Output ${fuzztestfile} FuzzTest_${TName}.txt)
+endforeach ()
+
+# fuzz testing with fuzzing harness
+if(BUILD_FUZZING_HARNESS)
+    add_executable(PDFParserFuzzingHarness PDFParserFuzzingHarness.cpp)
+    target_compile_options(PDFParserFuzzingHarness PRIVATE -fsanitize=fuzzer,address -g -O2)
+    target_link_libraries(PDFParserFuzzingHarness PDFWriter -O2 -fsanitize=fuzzer,address -fuse-ld=lld)
+endif()
+
 
 # create temp dir for output files
 set (TmpOutputDir ${CMAKE_BINARY_DIR}/Testing/Output)
