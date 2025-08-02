@@ -24,11 +24,14 @@
 #include "PDFRectangle.h"
 
 #include <string>
+#include <list>
 #include <set>
 
 
 
 typedef std::set<std::string> StringSet;
+
+typedef std::list<std::string> StringList;
 
 class ObjectsContext;
 
@@ -36,7 +39,7 @@ class DictionaryContext
 {
 public:
 	DictionaryContext(ObjectsContext* inObjectsContext,size_t inIndentLevel);
-	~DictionaryContext(void);
+	~DictionaryContext();
 
 	PDFHummus::EStatusCode WriteKey(const std::string& inKey);
 
@@ -55,6 +58,7 @@ public:
 	void WriteRectangleValue(const PDFRectangle& inRectangle);
 	void WriteDoubleValue(double inValue);
 	void WriteBooleanValue(bool inValue);
+	void WriteNameArray(const StringList& inArray);
 
 	// use WriteIndents when you are not using the above methods
 	// for writing, but instead using either primitivewriter, or objectscontext to write directly

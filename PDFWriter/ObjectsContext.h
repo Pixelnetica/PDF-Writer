@@ -43,8 +43,8 @@ typedef std::list<DictionaryContext*> DictionaryContextList;
 class ObjectsContext
 {
 public:
-	ObjectsContext(void);
-	~ObjectsContext(void);
+	ObjectsContext();
+	~ObjectsContext();
 
 	// Cleanup method. called in order to reset the object context for another production
 	void Cleanup();
@@ -126,6 +126,7 @@ public:
 
 	// Extensibility
 	void SetObjectsContextExtender(IObjectsContextExtender* inExtender);
+	IObjectsContextExtender* GetObjectsContextExtender(void);
 	
 
 	// as the obly common context around...i'm using the objects context to create
