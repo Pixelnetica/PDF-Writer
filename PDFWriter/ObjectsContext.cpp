@@ -21,7 +21,6 @@
 #include "ObjectsContext.h"
 #include "IOBasicTypes.h"
 #include "IByteWriterWithPosition.h"
-#include "IObjectsContextExtender.h"
 #include "SafeBufferMacrosDefs.h"
 #include "DictionaryContext.h"
 #include "Trace.h"
@@ -425,14 +424,7 @@ PDFStream* ObjectsContext::StartPDFStream(DictionaryContext* inStreamDictionary,
 		{
 			if(streamDictionaryContext->WriteKey(scFilter) != PDFHummus::eSuccess)
 				break;
-			if (mExtender && mExtender->OverridesStreamCompression()) 
-			{
-				StringList filters;
-				mExtender->GetCompressionFilters(filters);
-				streamDictionaryContext->WriteNameArray(filters);
-			}
-			else
-				streamDictionaryContext->WriteNameValue(scFlateDecode);
+			streamDictionaryContext->WriteNameValue(scFlateDecode);
 		}
 
 		if(!inForceDirectExtentObject)
@@ -562,11 +554,6 @@ EStatusCode ObjectsContext::WritePDFStreamExtent(PDFStream* inStream)
 void ObjectsContext::SetObjectsContextExtender(IObjectsContextExtender* inExtender)
 {
 	mExtender = inExtender;
-}
-
-IObjectsContextExtender* ObjectsContext::GetObjectsContextExtender(void) 
-{
-	return mExtender;
 }
 
 std::string ObjectsContext::GenerateSubsetFontPrefix()

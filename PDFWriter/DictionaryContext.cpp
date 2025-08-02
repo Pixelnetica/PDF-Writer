@@ -144,18 +144,3 @@ void DictionaryContext::WriteBooleanValue(bool inValue)
 {
 	mObjectsContext->WriteBoolean(inValue,eTokenSeparatorEndLine);
 }
-
-void DictionaryContext::WriteNameArray(const StringList& inArray)
-{
-	if (inArray.size() == 1) {
-		WriteNameValue(inArray.front());
-	} else {
-		mObjectsContext->StartArray();
-		for (const std::string& item : inArray)
-		{
-			mObjectsContext->WriteName(item);
-		}
-		mObjectsContext->EndArray();
-		mObjectsContext->EndLine();
-	}
-}

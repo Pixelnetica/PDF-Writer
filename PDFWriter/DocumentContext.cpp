@@ -134,14 +134,12 @@ TrailerInformation& DocumentContext::GetTrailerInformation()
 	return mTrailerInformation;
 }
 
-EStatusCode	DocumentContext::WriteHeader(EPDFVersion inPDFVersion,bool inBinaryData)
+EStatusCode	DocumentContext::WriteHeader(EPDFVersion inPDFVersion)
 {
 	if(mObjectsContext)
 	{
 		WriteHeaderComment(inPDFVersion);
-		if (inBinaryData) {
-			Write4BinaryBytes();
-		}
+		Write4BinaryBytes();
 		return PDFHummus::eSuccess;
 	}
 	else

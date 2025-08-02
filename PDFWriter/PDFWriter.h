@@ -58,7 +58,6 @@ struct PDFCreationSettings
 {
 	bool CompressStreams;
 	bool EmbedFonts;
-	bool BinaryData;
 	EncryptionOptions DocumentEncryptionOptions;
 	bool WriteXrefAsXrefStream;
 
