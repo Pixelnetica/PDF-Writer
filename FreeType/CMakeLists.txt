@@ -57,6 +57,9 @@ include/ft2build.h
 
 add_library(PDFHummus::FreeType ALIAS FreeType)
 
+# Setup common compiler options
+target_compile_options(FreeType PRIVATE ${SCANNING_OPTIONS})
+
 target_include_directories(FreeType
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>

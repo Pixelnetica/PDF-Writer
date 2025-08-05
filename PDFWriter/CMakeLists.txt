@@ -376,6 +376,9 @@ XObjectContentContext.h
 
 add_library(PDFHummus::PDFWriter ALIAS PDFWriter)
 
+# Setup common compiler options
+target_compile_options(PDFWriter PRIVATE ${SCANNING_OPTIONS})
+
 # zlib
 if(USING_UNBUNDLED_ZLIB)
     target_link_libraries(PDFWriter ZLIB::ZLIB)
