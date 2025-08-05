@@ -22,6 +22,7 @@
 
 #include <cstdio>
 #include <string>
+#include <cstring>
 
 
 namespace IOBasicTypes
@@ -77,11 +78,11 @@ namespace std {
             return nullptr;
         }
 
-        static constexpr char_type* move(char_type* dest, const char_type* src, size_t count) noexcept {
+        static /*constexpr*/ char_type* move(char_type* dest, const char_type* src, size_t count) noexcept {
             return static_cast<char_type*>(memmove(dest, src, count * sizeof(char_type)));
         }
 
-        static constexpr char_type* copy(char_type* dest, const char_type* src, size_t count) noexcept {
+        static /*constexpr*/ char_type* copy(char_type* dest, const char_type* src, size_t count) noexcept {
             return static_cast<char_type*>(memcpy(dest, src, count * sizeof(char_type)));
         }
 
