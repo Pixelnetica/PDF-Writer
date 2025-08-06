@@ -21,6 +21,8 @@ brg_types.h
 
 )
 
+target_compile_options(LibAesgm PRIVATE ${SCANNING_OPTIONS})
+
 add_library(PDFHummus::LibAesgm ALIAS LibAesgm)
 
 target_include_directories(LibAesgm
